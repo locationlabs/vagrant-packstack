@@ -1,0 +1,53 @@
+---
+  - name: Prereqs
+    hosts: vagrant
+    vars:
+      el_network_interfaces:
+        - iface: ens32
+          type: ethernet
+          dhcp: yes
+    roles:
+      - el-network
+    tasks:
+      - name: Update OS
+        yum:
+          name: '*'
+          state: latest
+          update_cache: yes
+
+      - name: Reboot host
+        shell: sleep 2 && shutdown -r now
+        async: 1
+        poll: 0
+
+      - name: Wait for the server to reboot
+        become: false
+        local_action: wait_for host="{{ansible_ssh_host}}" delay=15 state=started port="{{ansible_ssh_port}}" connect_timeout=10 timeout=180
+
+  - name: Install Packstack
+    hosts: vagrant
+    tasks:
+      - name: Install CentOS OpenStack repo
+        yum:
+          name: centos-release-openstack-ocata
+          state: present
+
+      - name: Install Packstack installer
+        yum:
+          name: openstack-packstack
+          state: present
+
+      - name: Run Packstack installer - Please Wait
+        command: 'packstack --allinone'
+        async: 1200 # Possible this needs to be larger
+        poll: 10
+        register: packstack_output
+
+      - name: Reboot host
+        shell: sleep 2 && shutdown -r now
+        async: 1
+        poll: 0
+
+      - name: Wait for the server to reboot
+        become: false
+        local_action: wait_for host="{{ansible_ssh_host}}" delay=15 state=started port="{{ansible_ssh_port}}" connect_timeout=10 timeout=180

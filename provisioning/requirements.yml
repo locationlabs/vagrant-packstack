@@ -1,0 +1,4 @@
+- src: https://github.int.llabs.io/ig/roles.el-network.git
+  version: origin/dhcp
+  scm: git
+  name: el-network

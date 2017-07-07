@@ -1,0 +1,14 @@
+_network_interfaces:
+  - iface: enp0s3
+    type: ethernet
+    dhcp: yes
+
+  - iface: enp0s8
+    type: ethernet
+    bridge: br-ex
+    ovs: yes
+
+  - iface: br-ex
+    type: bridge
+    ovs: yes
+    ipv4: '172.16.0.10/24'

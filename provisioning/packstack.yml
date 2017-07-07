@@ -2,10 +2,7 @@
   - name: Prereqs
     hosts: vagrant
     vars:
-      el_network_interfaces:
-        - iface: ens32
-          type: ethernet
-          dhcp: yes
+      el_network_interfaces: "{{[0]|map('extract', _network_interfaces)|list}}"
     roles:
       - el-network
     tasks:
@@ -56,15 +53,6 @@
   - name: Configure provider network
     hosts: vagrant
     vars:
-      el_network_interfaces:
-        - iface: ens33
-          type: ethernet
-          bridge: br-ex
-          ovs: yes
-
-        - iface: br-ex
-          type: bridge
-          ovs: yes
-          ipv4: '172.16.0.10/24'
+      el_network_interfaces: "{{ _network_interfaces }}"
     roles:
-      - { role: el-network, el_network_whitelist_ifaces: ['lo', 'ens32'] }
+      - el-network

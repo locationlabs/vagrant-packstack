@@ -22,11 +22,11 @@ Vagrant.configure("2") do |config|
     ps.vm.host_name = "packstack.vagrant"
     ps.vm.network 'private_network', ip: "172.16.0.10", auto_config: false
 
-    ps.vm.provider :virtualbox do |vb|
+    ps.vm.provider :virtualbox do |vb, override|
       vb.memory = 8192
       vb.cpus = 4
       vb.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 10000]
-      ps.vm.provision "ansible" do |ansible|
+      override.vm.provision "ansible" do |ansible|
         ansible.playbook = "provisioning/packstack.yml"
         ansible.extra_vars = "provisioning/vars-virtualbox.yml"
         ansible.sudo = true
@@ -38,11 +38,12 @@ Vagrant.configure("2") do |config|
       end
     end
 
-    ps.vm.provider "vmware_fusion" do |vm|
+    ps.vm.provider "vmware_fusion" do |vm, override|
       vm.vmx["memsize"] = 8192
       vm.vmx["numvcpus"] = 4
       vm.vmx["vhv.enable"] = "TRUE"
-      ps.vm.provision "ansible" do |ansible|
+      override.vm.provision "ansible" do |ansible|
+        ansible.verbose = true
         ansible.playbook = "provisioning/packstack.yml"
         ansible.extra_vars = "provisioning/vars-vmware.yml"
         ansible.sudo = true

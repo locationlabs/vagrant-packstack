@@ -35,7 +35,7 @@
           state: present
 
       - name: Run Packstack installer - Please Wait
-        command: 'packstack --allinone --service-workers=2 --os-swift-install=n --os-heat-install=y --os-neutron-lbaas-install=y --use-epel=y --provision-demo=n --os-neutron-ovs-bridge-mappings=extnet:br-ex --os-neutron-ovs-bridge-interfaces=br-ex:ens33 --os-neutron-ml2-type-drivers=vxlan,flat'
+        command: "packstack --allinone --service-workers=2 --os-swift-install=n --os-heat-install=y --os-neutron-lbaas-install=y --use-epel=y --provision-demo=n --os-neutron-ovs-bridge-mappings=extnet:br-ex --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }} --os-neutron-ml2-type-drivers=vxlan,flat"
         # --nova-libvirt-virt-type=kvm
         async: 1200 # Possible this needs to be larger
         poll: 10

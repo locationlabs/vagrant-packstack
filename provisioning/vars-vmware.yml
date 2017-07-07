@@ -12,3 +12,5 @@ _network_interfaces:
     type: bridge
     ovs: yes
     ipv4: '172.16.0.10/24'
+
+external_interface: ens33

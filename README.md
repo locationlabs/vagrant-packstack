@@ -18,4 +18,4 @@ Once you have your environment up, do `vagrant up` to start the virt and install
 takes a while
 
 After it is online, visit http://packstack.vagrant/dashboard with the creds found in
-``/root/keystone_[demo|admin]``
+`/root/keystone_admin`

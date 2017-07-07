@@ -38,7 +38,8 @@
           state: present
 
       - name: Run Packstack installer - Please Wait
-        command: 'packstack --allinone'
+        command: 'packstack --allinone --service-workers=2 --os-swift-install=n --os-heat-install=y --os-neutron-lbaas-install=y --use-epel=y --provision-demo=n --os-neutron-ovs-bridge-mappings=extnet:br-ex --os-neutron-ovs-bridge-interfaces=br-ex:ens33 --os-neutron-ml2-type-drivers=vxlan,flat'
+        # --nova-libvirt-virt-type=kvm
         async: 1200 # Possible this needs to be larger
         poll: 10
         register: packstack_output
@@ -51,3 +52,19 @@
       - name: Wait for the server to reboot
         become: false
         local_action: wait_for host="{{ansible_ssh_host}}" delay=15 state=started port="{{ansible_ssh_port}}" connect_timeout=10 timeout=180
+
+  - name: Configure provider network
+    hosts: vagrant
+    vars:
+      el_network_interfaces:
+        - iface: ens33
+          type: ethernet
+          bridge: br-ex
+          ovs: yes
+
+        - iface: br-ex
+          type: bridge
+          ovs: yes
+          ipv4: '172.16.0.10/24'
+    roles:
+      - { role: el-network, el_network_whitelist_ifaces: ['lo', 'ens32'] }

@@ -10,7 +10,7 @@ environment.
 * vagrant-timezone
 * ansible
  * `mkvirtualenv vagrant-packstack -r requirements.txt`
-* GB of ram is needed by the virt
+* 8GB of ram is needed by the virt
 
 ## Start the show
 

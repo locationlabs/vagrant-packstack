@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
 
     ps.vm.provider :virtualbox do |vb, override|
       vb.memory = 8192
-      vb.cpus = 4
+      vb.cpus = 2
       vb.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 10000]
       override.vm.provision "ansible" do |ansible|
         ansible.playbook = "provisioning/packstack.yml"
@@ -40,10 +40,9 @@ Vagrant.configure("2") do |config|
 
     ps.vm.provider "vmware_fusion" do |vm, override|
       vm.vmx["memsize"] = 8192
-      vm.vmx["numvcpus"] = 4
+      vm.vmx["numvcpus"] = 2
       vm.vmx["vhv.enable"] = "TRUE"
       override.vm.provision "ansible" do |ansible|
-        ansible.verbose = true
         ansible.playbook = "provisioning/packstack.yml"
         ansible.extra_vars = "provisioning/vars-vmware.yml"
         ansible.sudo = true

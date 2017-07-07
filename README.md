@@ -10,12 +10,16 @@ environment.
 * vagrant-timezone
 * ansible
  * `mkvirtualenv vagrant-packstack -r requirements.txt`
-* 6GB of ram is needed by the virt
+* GB of ram is needed by the virt
 
 ## Start the show
 
-Once you have your environment up, do `vagrant up` to start the virt and installation. **Note** this
+1. Once you have your environment up, do `vagrant up` to start the virt and installation. **Note** this
 takes a while
 
+2. Provision the "vagrant" project and user in openstack:
+ 1. `source provisioning/openstack/keystonerc_admin`
+ 2. `ansible-playbook provisioning/openstack/vagrant-demo-env.yml`
+
 After it is online, visit http://packstack.vagrant/dashboard with the creds found in
-`/root/keystone_admin`
+`provisioning/openstack/keystonerc_[admin|vagrant]` or use the openstack client.

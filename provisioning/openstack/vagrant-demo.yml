@@ -1,0 +1,23 @@
+---
+  - name: Vagrant demo
+    hosts: localhost
+    become: false
+    tasks:
+      - name: Create internal network
+        os_network:
+          name: internal_network
+          state: present
+
+      - name: Create internal subnet
+        os_subnet:
+          name: internal_subnet
+          network_name: internal_network
+          cidr: 192.168.0.0/24
+          state: present
+
+      - name: Create a router
+        os_router:
+          name: vagrant_router
+          network: local_external_network
+          interfaces:
+            - internal_subnet

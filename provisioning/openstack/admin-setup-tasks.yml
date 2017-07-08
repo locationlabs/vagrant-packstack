@@ -1,5 +1,5 @@
 ---
-  - name: Configure demo environment
+  - name: Configure openstack for vagrant demo environment
     hosts: localhost
     become: false
     tasks:
@@ -16,7 +16,7 @@
           name: local_external_subnet
           network_name: local_external_network
           cidr: 172.16.0.0/24
-          no_gateway_ip: yes
+          gateway_ip: 172.16.0.1
           enable_dhcp: no
           state: present
 
@@ -49,3 +49,14 @@
           default_project: vagrant
           state: present
           enabled: True
+
+      - name: Create a role
+        os_keystone_role:
+          name: vagrant_role
+          state: present
+
+      - name: Add user to roles
+        os_user_role:
+          user: vagrant
+          role: vagrant_role
+          project: vagrant

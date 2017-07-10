@@ -5,18 +5,6 @@ Vagrant.configure("2") do |config|
   config.hostmanager.manage_host = true
   config.hostmanager.include_offline = true
 
-  # cached_addresses = {}
-  # config.hostmanager.ip_resolver = proc do |vm, resolving_vm|
-  #   if cached_addresses[vm.name].nil?
-  #     if hostname = (vm.ssh_info && vm.ssh_info[:host])
-  #       vm.communicate.execute("ip -f inet -o addr show | sed -n 2p | awk '{print $4}' | cut -d '/' -f 1") do |type, contents|
-  #         cached_addresses[vm.name] = contents.chomp
-  #       end
-  #     end
-  #   end
-  #   cached_addresses[vm.name]
-  # end
-
   config.vm.define "packstack" do |ps|
     ps.vm.box = "bento/centos-7.3"
     ps.vm.host_name = "packstack.vagrant"

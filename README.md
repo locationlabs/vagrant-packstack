@@ -36,6 +36,43 @@ After it is online, visit http://packstack.vagrant/dashboard with the creds foun
 
 ---
 
-Refrences:
+## Networking
+
+The vagrant is configured with two interfaces:
+1. The default interface used by vagrant to control the box
+2. Used by OpenStack as the external provider network, as well as for API access from the host
+
+Here is what this looks like after `admin-setup-tasks.yml` and `vagrant-demo.yml` have been run. 
+
+```
++--------+     +----------+
+|        |     |          |
+|  host  +---> |  enp0s3  |
+|        |     |          |
++---+----+     +----------+
+    |
+    |          +----------+  +---------+
+    |          |          |  |         |
+    +--------> |  enp0s8  +--+  br-ex  |
+               |          |  |         |
+               +----------+  +----+----+
+                                  |
+                                  |
+                             +----+-----+
+                             |          |
+                             |  router  |
+                             |          |
+                             +----+-----+
+                                  |
++------------+   +-------+   +----+-----+
+|            |   |       |   |          |
+|  instance  +---+  qbr  +---+  br-int  |
+|            |   |       |   |          |
++------------+   +-------+   +----------+
+```
+
+
+References:
 * https://www.rdoproject.org/networking/neutron-with-existing-external-network/
+* https://www.rdoproject.org/networking/networking-in-too-much-detail/
 * http://docs.ansible.com/ansible/list_of_cloud_modules.html#openstack

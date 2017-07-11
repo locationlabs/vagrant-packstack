@@ -42,7 +42,7 @@ The vagrant is configured with two interfaces:
 1. The default interface used by vagrant to control the box
 2. Used by OpenStack as the external provider network, as well as for API access from the host
 
-Here is what this looks like after `admin-setup-tasks.yml` and `vagrant-demo.yml` have been run. 
+Here is what this looks like after `admin-setup-tasks.yml` and `vagrant-demo.yml` have been run.
 
 ```
 +--------+     +----------+
@@ -71,6 +71,12 @@ Here is what this looks like after `admin-setup-tasks.yml` and `vagrant-demo.yml
 +------------+   +-------+   +----------+
 ```
 
+## Customizing Packstack
+
+Currently the Packstack installer is customized via command line options. If you wish to further
+customize the installer, update the command in `provisioning/vagrant/packstack-install.yml`. Running
+`packstack --help` will display all the available options. Note, the more services you enable, the
+more memory used.
 
 References:
 * https://www.rdoproject.org/networking/neutron-with-existing-external-network/

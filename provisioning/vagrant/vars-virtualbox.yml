@@ -11,6 +11,6 @@ _network_interfaces:
   - iface: br-ex
     type: bridge
     ovs: yes
-    ip4: '172.16.0.10/24'
+    ip4: '172.16.0.2/24'
 
 external_interface: enp0s8

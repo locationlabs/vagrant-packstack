@@ -2,6 +2,7 @@
   - name: Configure openstack for vagrant demo environment
     hosts: localhost
     become: false
+    gather_facts: false
     tasks:
       - name: Create local "external" network
         os_network:
@@ -17,6 +18,8 @@
           network_name: local_external_network
           cidr: 172.16.0.0/24
           gateway_ip: 172.16.0.1
+          allocation_pool_start: 172.16.0.3
+          allocation_pool_end: 172.16.0.254
           enable_dhcp: no
           state: present
 

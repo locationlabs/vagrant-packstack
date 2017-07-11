@@ -2,6 +2,7 @@
   - name: Vagrant demo
     hosts: localhost
     become: false
+    gather_facts: false
     tasks:
       - name: Create internal network
         os_network:

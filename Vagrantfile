@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "packstack" do |ps|
     ps.vm.box = "bento/centos-7.3"
     ps.vm.host_name = "packstack.vagrant"
-    ps.vm.network 'private_network', ip: "172.16.0.10", auto_config: false
+    ps.vm.network 'private_network', ip: "172.16.0.2"
 
     ps.vm.provider :virtualbox do |vb, override|
       vb.memory = 8192

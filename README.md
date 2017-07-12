@@ -17,6 +17,8 @@ environment.
 1. Once you have your environment up, do `vagrant up` to start the virt and installation. **Note**
 this takes a while, go get some coffee...
 
+_There is a chance of a failure on the last provisioning step (Restart Networking), this is not a fatal error and you can continue_
+
 ### OpenStack Orchestration via Ansible
 
 Next up we need to setup OpenStack with a way to let instances get to the outside world, this is

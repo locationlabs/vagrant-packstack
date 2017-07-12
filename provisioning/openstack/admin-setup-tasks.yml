@@ -10,6 +10,7 @@
           provider_network_type: flat
           provider_physical_network: extnet
           external: yes
+          shared: yes
           state: present
 
       - name: Create subnet for local "external" network
@@ -34,6 +35,7 @@
           filename: /tmp/cirros-0.3.4-x86_64-disk.img
           container_format: bare
           disk_format: qcow2
+          is_public: yes
           state: present
 
       - name: Create the vagrant project

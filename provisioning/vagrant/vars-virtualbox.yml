@@ -1,17 +1,18 @@
 _network_interfaces:
   - iface: enp0s3
     type: ethernet
-    dhcp: yes
+    bridge: br-ex
+    ovs: yes
 
   - iface: enp0s8
     type: ethernet
-    bridge: br-ex
-    ovs: yes
+    ip4: '{{ local_ip }}/24'
 
   - iface: br-ex
     type: bridge
     ovs: yes
-    ip4: '{{ external_ip }}/24'
+    ip4: '{{ ansible_default_ipv4.address }}/24'
+    gw4: '{{ ansible_default_ipv4.gateway }}'
 
-external_ip: 172.16.0.2
+local_ip: 172.16.0.2
 external_interface: enp0s8

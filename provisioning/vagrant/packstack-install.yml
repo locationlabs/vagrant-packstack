@@ -31,7 +31,7 @@
           state: present
 
       - name: Run Packstack installer - Please Wait
-        command: "packstack --default-password=admin --install-hosts={{ external_ip }} --service-workers=1 --os-swift-install=n --os-heat-cfn-install=n --os-heat-cloudwatch-install=n --os-heat-install=y --os-neutron-lbaas-install=y --neutron-fwaas=y --os-neutron-vpnaas-install=y --os-neutron-metering-agent-install=n --use-epel=y --provision-demo=n --os-neutron-ovs-bridge-mappings=extnet:br-ex --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }} --os-neutron-ml2-type-drivers=vxlan,flat"
+        command: "packstack --default-password=admin --install-hosts={{ local_ip }} --service-workers=1 --os-swift-install=n --os-heat-cfn-install=n --os-heat-cloudwatch-install=n --os-heat-install=y --os-neutron-lbaas-install=y --neutron-fwaas=y --os-neutron-vpnaas-install=y --os-neutron-metering-agent-install=n --use-epel=y --provision-demo=n --os-neutron-ovs-bridge-mappings=extnet:br-ex --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }} --os-neutron-ml2-type-drivers=vxlan,flat"
         async: 1200 # Possible this needs to be larger
         poll: 10
         register: packstack_output

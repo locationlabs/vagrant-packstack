@@ -3,26 +3,39 @@
     hosts: vagrant
     become: false
     tasks:
+      - name: External network facts
+        set_fact:
+          external_cidr: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net') }}"
+          external_gateway: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('1')|ipv4('address') }}"
+
+      - name: Local network facts
+        set_fact:
+          local_cidr: "{{ ansible_br_local.ipv4.address|ipsubnet(24)|ipaddr('net') }}"
+          local_gateway: "{{ ansible_br_local.ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('1')|ipv4('address') }}"
+        when: ansible_br_local is defined
+
       - block:
-        - name: Create local "external" network
+        - name: Create external network
           os_network:
-            name: local_external_network
+            name: "extnet"
             provider_network_type: flat
-            provider_physical_network: extnet
+            provider_physical_network: "extnet"
             external: yes
             shared: yes
             state: present
+            project: services
 
-        - name: Create subnet for local "external" network
+        - name: Create external subnet
           os_subnet:
-            name: local_external_subnet
-            network_name: local_external_network
-            cidr: "{{ ansible_default_ipv4.address|ipsubnet(24)|ipaddr('net') }}"
-            gateway_ip: "{{ ansible_default_ipv4.gateway }}"
-            allocation_pool_start: "{{ ansible_default_ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('3')|ipv4('address') }}"
-            allocation_pool_end: "{{ ansible_default_ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('254')|ipv4('address') }}"
+            name: "ext_subnet"
+            network_name: "extnet"
+            cidr: "{{ external_cidr }}"
+            gateway_ip: "{{ external_gateway }}"
+            allocation_pool_start: "{{ external_cidr|ipaddr('20')|ipv4('address') }}"
+            allocation_pool_end: "{{ external_cidr|ipaddr('30')|ipv4('address') }}"
             enable_dhcp: no
             state: present
+            project: services
 
         - name: Download cirros image
           get_url:
@@ -66,4 +79,30 @@
             role: vagrant_role
             project: vagrant
 
+        delegate_to: 127.0.0.1
+
+      - block:
+        - name: Create local network
+          os_network:
+            name: "localnet"
+            provider_network_type: flat
+            provider_physical_network: "localnet"
+            external: yes
+            shared: yes
+            state: present
+            project: services
+
+        - name: Create local subnet
+          os_subnet:
+            name: "local_subnet"
+            network_name: "localnet"
+            cidr: "{{ local_cidr }}"
+            gateway_ip: "{{ local_gateway }}"
+            allocation_pool_start: "{{ local_cidr|ipaddr('20')|ipv4('address') }}"
+            allocation_pool_end: "{{ local_cidr|ipaddr('30')|ipv4('address') }}"
+            enable_dhcp: no
+            state: present
+            project: services
+
+        when: ansible_br_local is defined
         delegate_to: 127.0.0.1

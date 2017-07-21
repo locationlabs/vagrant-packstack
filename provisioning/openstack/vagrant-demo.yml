@@ -19,12 +19,50 @@
            - 8.8.4.4
           state: present
 
-      - name: Create a router
+      - name: Create external router
         os_router:
-          name: vagrant_router
-          network: local_external_network
+          name: vagrant_extnet
+          network: extnet
           interfaces:
             - internal_subnet
+
+      - os_networks_facts:
+          name: localnet
+
+      - block:
+        - name: Create local router
+          os_router:
+            name: vagrant_localnet
+            network: localnet
+          register: localnet_router
+
+        # Doesn't add port in a way that brings it up, probablily a bug in module
+        # https://github.com/ansible/ansible/issues/19612
+        - name: Create port for local router on internal network
+          os_port:
+            name: localnet_router_port
+            network: internal_network
+            no_security_groups: True
+            state: present
+          register: localnet_router_port
+
+        - os_subnets_facts:
+            name: "{{ localnet_router.router.external_gateway_info.external_fixed_ips[0].subnet_id }}"
+
+        - name: Add port via cli
+          command: openstack router add port vagrant_localnet localnet_router_port
+          when: localnet_router.changed and localnet_router_port.changed
+
+        - name: Update internal network routes
+          os_subnet:
+            name: internal_subnet
+            network_name: internal_network
+            use_default_subnetpool: yes
+            host_routes:
+              - destination: "{{ openstack_subnets[0].cidr }}"
+                nexthop: "{{ localnet_router_port.port.fixed_ips[0].ip_address }}"
+            state: present
+        when: openstack_networks|length>0
 
       - name: Add "Allow ping" rule to default security group
         os_security_group_rule:

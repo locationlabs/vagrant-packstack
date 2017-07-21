@@ -1,0 +1,15 @@
+external_interface: "ens33"
+el_network_interfaces:
+  - iface: ens32
+    type: ethernet
+    ip4: "{{ ansible_default_ipv4.address }}/24"
+    gw4: "{{ ansible_default_ipv4.gateway }}"
+
+  - iface: "{{ external_interface }}"
+    type: ethernet
+    ip4: '{{ ansible_ens33.ipv4.address }}/24'
+
+packstack_network: "--os-neutron-ovs-bridge-mappings=extnet:br-ex \
+  --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }} \
+  --os-neutron-l3-ext-bridge=br-ex"
+openstack_api_ip: "{{ ansible_ens33.ipv4.address }}"

@@ -1,0 +1,24 @@
+local_interface: "enp0s8"
+external_interface: "enp0s9"
+el_network_interfaces:
+  # Vagrant interface - VirtualBox NAT interface
+  - iface: enp0s3
+    type: ethernet
+    ip4: "{{ ansible_default_ipv4.address }}/24"
+    gw4: "{{ ansible_default_ipv4.gateway }}"
+
+  # Vagrant private network - VirtualBox Host-only interface
+  # Used for API calls from host
+  - iface: "{{ local_interface }}"
+    type: ethernet
+    ip4: "{{ ansible_enp0s8.ipv4.address }}/24"
+
+  # VirtualBox NAT Network interface
+  # Used as the external network for OpenStack
+  - iface: "{{ external_interface }}"
+    type: ethernet
+    ip4: "172.16.1.10/24"
+
+packstack_network: "--os-neutron-ovs-bridge-mappings=extnet:br-ex,localnet:br-local \
+  --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }},br-local:{{ local_interface }}"
+openstack_api_ip: "{{ ansible_enp0s8.ipv4.address }}"

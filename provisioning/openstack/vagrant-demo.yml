@@ -1,0 +1,87 @@
+---
+  - name: Vagrant demo
+    hosts: localhost
+    become: false
+    gather_facts: false
+    tasks:
+      - name: Create internal network
+        os_network:
+          name: internal_network
+          state: present
+
+      - name: Create internal subnet
+        os_subnet:
+          name: internal_subnet
+          network_name: internal_network
+          cidr: 192.168.0.0/24
+          dns_nameservers:
+           - 8.8.8.8
+           - 8.8.4.4
+          state: present
+
+      - name: Create external router
+        os_router:
+          name: vagrant_extnet
+          network: extnet
+          interfaces:
+            - internal_subnet
+
+      - os_networks_facts:
+          name: localnet
+
+      - block:
+        - name: Create local router
+          os_router:
+            name: vagrant_localnet
+            network: localnet
+          register: localnet_router
+
+        # Doesn't add port in a way that brings it up, probablily a bug in module
+        # https://github.com/ansible/ansible/issues/19612
+        - name: Create port for local router on internal network
+          os_port:
+            name: localnet_router_port
+            network: internal_network
+            no_security_groups: True
+            state: present
+          register: localnet_router_port
+
+        - os_subnets_facts:
+            name: "{{ localnet_router.router.external_gateway_info.external_fixed_ips[0].subnet_id }}"
+
+        - name: Add port via cli
+          command: openstack router add port vagrant_localnet localnet_router_port
+          when: localnet_router.changed and localnet_router_port.changed
+
+        - name: Update internal network routes
+          os_subnet:
+            name: internal_subnet
+            network_name: internal_network
+            use_default_subnetpool: yes
+            host_routes:
+              - destination: "{{ openstack_subnets[0].cidr }}"
+                nexthop: "{{ localnet_router_port.port.fixed_ips[0].ip_address }}"
+            state: present
+        when: openstack_networks|length>0
+
+      - name: Add "Allow ping" rule to default security group
+        os_security_group_rule:
+          security_group: default
+          protocol: icmp
+          remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
+
+      - name: Add "Allow ssh" rule to default security group
+        os_security_group_rule:
+          security_group: default
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+          remote_ip_prefix: 0.0.0.0/0
+          direction: ingress
+
+      - name: Add your ssh public key
+        os_keypair:
+          state: present
+          name: ansible_key
+          public_key_file: "{{ lookup('env','HOME') }}/.ssh/id_rsa.pub"

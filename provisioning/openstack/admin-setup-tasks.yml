@@ -1,0 +1,108 @@
+---
+  - name: Configure openstack for vagrant demo environment
+    hosts: vagrant
+    become: false
+    tasks:
+      - name: External network facts
+        set_fact:
+          external_cidr: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net') }}"
+          external_gateway: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('1')|ipv4('address') }}"
+
+      - name: Local network facts
+        set_fact:
+          local_cidr: "{{ ansible_br_local.ipv4.address|ipsubnet(24)|ipaddr('net') }}"
+          local_gateway: "{{ ansible_br_local.ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('1')|ipv4('address') }}"
+        when: ansible_br_local is defined
+
+      - block:
+        - name: Create external network
+          os_network:
+            name: "extnet"
+            provider_network_type: flat
+            provider_physical_network: "extnet"
+            external: yes
+            shared: yes
+            state: present
+            project: services
+
+        - name: Create external subnet
+          os_subnet:
+            name: "ext_subnet"
+            network_name: "extnet"
+            cidr: "{{ external_cidr }}"
+            gateway_ip: "{{ external_gateway }}"
+            allocation_pool_start: "{{ external_cidr|ipaddr('20')|ipv4('address') }}"
+            allocation_pool_end: "{{ external_cidr|ipaddr('30')|ipv4('address') }}"
+            enable_dhcp: no
+            state: present
+            project: services
+
+        - name: Download cirros image
+          get_url:
+            url: http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
+            dest: /tmp/cirros-0.3.4-x86_64-disk.img
+
+        - name: Upload cirros image
+          os_image:
+            name: cirros
+            filename: /tmp/cirros-0.3.4-x86_64-disk.img
+            container_format: bare
+            disk_format: qcow2
+            is_public: yes
+            state: present
+
+        - name: Create the vagrant project
+          os_project:
+            name: vagrant
+            domain: Default
+            state: present
+            enabled: True
+
+        - name: Create the vagrant user
+          os_user:
+            name: vagrant
+            password: vagrant
+            email: vagrant@localhost
+            domain: Default
+            default_project: vagrant
+            state: present
+            enabled: True
+
+        - name: Create a role
+          os_keystone_role:
+            name: vagrant_role
+            state: present
+
+        - name: Add user to roles
+          os_user_role:
+            user: vagrant
+            role: vagrant_role
+            project: vagrant
+
+        delegate_to: 127.0.0.1
+
+      - block:
+        - name: Create local network
+          os_network:
+            name: "localnet"
+            provider_network_type: flat
+            provider_physical_network: "localnet"
+            external: yes
+            shared: yes
+            state: present
+            project: services
+
+        - name: Create local subnet
+          os_subnet:
+            name: "local_subnet"
+            network_name: "localnet"
+            cidr: "{{ local_cidr }}"
+            gateway_ip: "{{ local_gateway }}"
+            allocation_pool_start: "{{ local_cidr|ipaddr('20')|ipv4('address') }}"
+            allocation_pool_end: "{{ local_cidr|ipaddr('30')|ipv4('address') }}"
+            enable_dhcp: no
+            state: present
+            project: services
+
+        when: ansible_br_local is defined
+        delegate_to: 127.0.0.1

@@ -19,6 +19,6 @@ el_network_interfaces:
     type: ethernet
     ip4: "172.16.1.10/24"
 
-packstack_network: "--os-neutron-ovs-bridge-mappings=extnet:br-ex,localnet:br-local \
+packstack_guest_specific_args: "--os-neutron-ovs-bridge-mappings=extnet:br-ex,localnet:br-local \
   --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }},br-local:{{ local_interface }}"
 openstack_api_ip: "{{ ansible_enp0s8.ipv4.address }}"

@@ -11,6 +11,9 @@
           update_cache: yes
         register: yum_upgrade
 
+      - name: Update networking before reboot
+        meta: flush_handlers
+
       - name: Reboot host
         shell: sleep 2 && shutdown -r now
         async: 1
@@ -58,7 +61,7 @@
           state: present
 
       - name: Run Packstack Installer - Please Wait
-        command: "{{ packstack_common_command + packstack_network }}"
+        command: "{{ packstack_common_command + packstack_guest_specific_args }}"
         async: 1200 # Possible this needs to be larger
         poll: 10
 

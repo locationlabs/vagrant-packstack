@@ -6,10 +6,12 @@ environment.
 ## Prereqs
 
 * VirtualBox
+ * Configure a NAT Network
+        VBoxManage natnetwork add --netname packstack --network 172.16.1.0/24 --enable
 * vagrant-hostmanager
 * vagrant-timezone
 * ansible
- * `mkvirtualenv vagrant-packstack -r requirements.txt`
+      mkvirtualenv vagrant-packstack -r requirements.txt
 * 8GB of ram is needed by the virt
 
 ## Start the show
@@ -40,38 +42,16 @@ After it is online, visit http://packstack.vagrant/dashboard with the creds foun
 
 ## Networking
 
-The vagrant is configured with two interfaces:
+The vagrant is configured with three interfaces:
 1. The default interface used by vagrant to control the box
-2. Used by OpenStack as the external provider network, as well as for API access from the host
+2. Used by OpenStack for API access from the host
+3. Used by OpenStack for external access for instances to reach the internet
 
-Here is what this looks like after `admin-setup-tasks.yml` and `vagrant-demo.yml` have been run.
-
-```
-+--------+     +----------+
-|        |     |          |
-|  host  +---> |  enp0s3  |
-|        |     |          |
-+---+----+     +----------+
-    |
-    |          +----------+  +---------+
-    |          |          |  |         |
-    +--------> |  enp0s8  +--+  br-ex  |
-               |          |  |         |
-               +----------+  +----+----+
-                                  |
-                                  |
-                             +----+-----+
-                             |          |
-                             |  router  |
-                             |          |
-                             +----+-----+
-                                  |
-+------------+   +-------+   +----+-----+
-|            |   |       |   |          |
-|  instance  +---+  qbr  +---+  br-int  |
-|            |   |       |   |          |
-+------------+   +-------+   +----------+
-```
+Due to the limitations of the NAT Network and Host-Only interfaces, we are not able to reach
+instances directly from host, but only locally from within the vagrant. All signs point to
+VirtualBox filtering these interfaces before they reach the guest. A thought was to use Bridged
+networking, but that is too dependent on someone's networking environment that I could not write a
+portable environment to handle all cases.
 
 ## Customizing Packstack
 
@@ -79,6 +59,14 @@ Currently the Packstack installer is customized via command line options. If you
 customize the installer, update the command in `provisioning/vagrant/packstack-install.yml`. Running
 `packstack --help` will display all the available options. Note, the more services you enable, the
 more memory used.
+
+---
+
+## VMWare Fusion
+
+VMWare Fusion doesn't have these network limitations and so we don't need that third NAT Network interface and are able to directly access instances from the host.
+
+---
 
 References:
 * https://www.rdoproject.org/networking/neutron-with-existing-external-network/

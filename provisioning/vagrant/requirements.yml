@@ -1,4 +1,3 @@
-- src: https://github.com/locationlabs/el-network.git
+- src: locationlabs.el-network
   version: '1.0'
-  scm: git
   name: el-network

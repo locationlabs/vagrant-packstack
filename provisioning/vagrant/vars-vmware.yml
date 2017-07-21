@@ -11,6 +11,5 @@ el_network_interfaces:
 
 packstack_guest_specific_args: "--os-neutron-ovs-bridge-mappings=extnet:br-ex \
   --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }} \
-  --os-neutron-l3-ext-bridge=br-ex \
-  --nova-libvirt-virt-type=kvm"
+  --os-neutron-l3-ext-bridge=br-ex"
 openstack_api_ip: "{{ ansible_ens33.ipv4.address }}"

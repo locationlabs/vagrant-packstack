@@ -2,11 +2,17 @@
   - name: Configure openstack for vagrant demo environment
     hosts: vagrant
     become: false
+    vars:
+      external_gateway_octet: '1'
     tasks:
+      - set_fact:
+          external_gateway_octet: '2'
+        when: ansible_virtualization_type == 'VMware'
+
       - name: External network facts
         set_fact:
           external_cidr: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net') }}"
-          external_gateway: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr('1')|ipv4('address') }}"
+          external_gateway: "{{ ansible_br_ex.ipv4.address|ipsubnet(24)|ipaddr('net')|ipaddr(external_gateway_octet)|ipv4('address') }}"
 
       - name: Local network facts
         set_fact:

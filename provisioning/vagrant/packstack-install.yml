@@ -32,8 +32,6 @@
         --install-hosts={{ openstack_api_ip }} \
         --service-workers=1 \
         --os-swift-install=n \
-        --os-heat-cfn-install=n \
-        --os-heat-cloudwatch-install=n \
         --os-heat-install=y \
         --os-neutron-lbaas-install=y \
         --neutron-fwaas=y \

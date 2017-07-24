@@ -5,8 +5,9 @@
 heat_template_version: 2013-05-23
 
 description: >
-  Hello world HOT template that just defines a single server.
-  Contains just base features to verify base HOT support.
+  HOT template that just defines auto scaling group.
+  You can scale up and down by sending a POST, or by
+  starting an evil script in one host to ramp up the CPU.
 parameters:
   key_name:
     type: string
@@ -36,6 +37,7 @@ parameters:
       - allowed_pattern: "[a-zA-Z0-9]+"
         description: Password must consist of characters and numbers only
 
+
 resources:
   asg:
     type: OS::Heat::AutoScalingGroup
@@ -59,6 +61,7 @@ resources:
       auto_scaling_group_id: {get_resource: asg}
       cooldown: 60
       scaling_adjustment: 1
+
   scale_down_policy:
     type: OS::Heat::ScalingPolicy
     properties:
@@ -66,6 +69,19 @@ resources:
       auto_scaling_group_id: {get_resource: asg}
       cooldown: 60
       scaling_adjustment: '-1'
+
+  cpu_alarm_high:
+    type: OS::Ceilometer::Alarm
+    properties:
+      meter_name: cpu_util
+      statistic: avg
+      period: 60
+      evaluation_periods: 1
+      threshold: 50
+      alarm_actions:
+        - {get_attr: [scale_up_policy, alarm_url]}
+      comparison_operator: gt
+
 
 outputs:
   scale_up_url:

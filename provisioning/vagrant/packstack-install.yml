@@ -11,9 +11,6 @@
         --os-heat-cfn-install=n \
         --os-heat-cloudwatch-install=n \
         --os-heat-install=y \
-        --os-neutron-lbaas-install=y \
-        --neutron-fwaas=y \
-        --os-neutron-vpnaas-install=y \
         --os-neutron-metering-agent-install=n \
         --use-epel=n \
         --provision-demo=n \

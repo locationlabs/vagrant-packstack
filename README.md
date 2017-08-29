@@ -67,6 +67,13 @@ more memory used.
 
 VMWare Fusion doesn't have these network limitations and so we don't need that third NAT Network interface and are able to directly access instances from the host.
 
+### Nested KVM
+
+At this time I cannot enable nested kvm support (presumably) due to these two bugs:
+
+* 3.10 kernel bug - https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1278531
+* Apparent VMWare bug - https://bugzilla.redhat.com/show_bug.cgi?id=1456407
+
 ---
 
 References:

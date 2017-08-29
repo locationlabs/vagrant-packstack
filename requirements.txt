@@ -2,4 +2,7 @@ ansible==2.3.1.0
 shade==1.22.2 # Used by the ansible openstack modules
 python-openstackclient==3.11.0 # Provides the openstack cli
 python-heatclient==1.10.0
+pankoclient==0.3.0 # Telemetry - Events
+aodhclient==0.9.0 # Telemetry - Alarms
+gnocchiclient==3.3.1 # Telemetry - Metrics storage
 netaddr

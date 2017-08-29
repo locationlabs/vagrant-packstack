@@ -10,9 +10,11 @@
         --os-swift-install=n \
         --os-cinder-install=n \
         --os-heat-install=y \
+        --os-panko-install=y \
         --os-neutron-metering-agent-install=n \
         --use-epel=n \
         --provision-demo=n \
+        --nova-manage-flavors=n \
         --os-neutron-ml2-type-drivers=vxlan,flat \
         "
     tasks:

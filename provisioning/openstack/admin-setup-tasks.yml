@@ -4,6 +4,20 @@
     become: false
     vars:
       external_gateway_octet: '1'
+      image_list:
+        - name: "ubuntu-xenial"
+          url: "http://cloud-images.ubuntu.com/daily/server/xenial/current/xenial-server-cloudimg-amd64-disk1.img"
+          min_disk: "5"
+          properties:
+            os_distro: "ubuntu"
+            architecture: "x86_64"
+            hw_scsi_model: "virtio-scsi"
+            hw_disk_bus: "scsi"
+            hw_vif_model: "virtio"
+
+        - name: "cirros"
+          url: "http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img"
+
     tasks:
       - set_fact:
           external_gateway_octet: '2'
@@ -21,15 +35,24 @@
         when: ansible_br_local is defined
 
       - block:
+        - name: Create a little flavor
+          os_nova_flavor:
+            name: "{{ item.name }}"
+            ram: "{{ item.ram }}"
+            vcpus: "{{ item.vcpus }}"
+            disk: "{{ item.disk }}"
+            state: present
+          with_items:
+            - { name: "m1.tiny", ram: "512", vcpus: "1", disk: "1" }
+            - { name: "m1.small", ram: "1024", vcpus: "1", disk: "5" }
+
         - name: Create external network
           os_network:
             name: "extnet"
             provider_network_type: flat
             provider_physical_network: "extnet"
             external: yes
-            shared: yes
             state: present
-            project: services
 
         - name: Create external subnet
           os_subnet:
@@ -41,21 +64,24 @@
             allocation_pool_end: "{{ external_cidr|ipaddr('30')|ipv4('address') }}"
             enable_dhcp: no
             state: present
-            project: services
 
-        - name: Download cirros image
+        - name: Download images
           get_url:
-            url: http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
-            dest: /tmp/cirros-0.3.4-x86_64-disk.img
+            url: "{{ item.url }}"
+            dest: "{{ item.name }}.img"
+          with_items: "{{ image_list }}"
 
-        - name: Upload cirros image
+        - name: Upload images
           os_image:
-            name: cirros
-            filename: /tmp/cirros-0.3.4-x86_64-disk.img
+            name: "{{ item.name }}"
+            filename: "{{ item.name }}.img"
+            min_disk: "{{ item.min_disk|default(omit) }}"
             container_format: bare
             disk_format: qcow2
             is_public: yes
             state: present
+            properties: "{{ item.properties|default(omit) }}"
+          with_items: "{{ image_list }}"
 
         - name: Create the vagrant project
           os_project:
@@ -94,9 +120,7 @@
             provider_network_type: flat
             provider_physical_network: "localnet"
             external: yes
-            shared: yes
             state: present
-            project: services
 
         - name: Create local subnet
           os_subnet:
@@ -108,7 +132,6 @@
             allocation_pool_end: "{{ local_cidr|ipaddr('30')|ipv4('address') }}"
             enable_dhcp: no
             state: present
-            project: services
 
         when: ansible_br_local is defined
         delegate_to: 127.0.0.1

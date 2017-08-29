@@ -10,6 +10,7 @@ environment.
         VBoxManage natnetwork add --netname packstack --network 172.16.1.0/24 --enable
 * vagrant-hostmanager
 * vagrant-timezone
+* vagrant-reload
 * ansible
       mkvirtualenv vagrant-packstack -r requirements.txt
 * 8GB of ram is needed by the virt

@@ -3,30 +3,6 @@
     hosts: vagrant
     roles:
       - el-network
-    tasks:
-      - name: Yum upgrade
-        yum:
-          name: '*'
-          state: latest
-          update_cache: yes
-        register: yum_upgrade
-
-      - name: Update networking before reboot
-        meta: flush_handlers
-
-      - name: Reboot host
-        shell: sleep 2 && shutdown -r now
-        async: 1
-        poll: 0
-        when: yum_upgrade.changed
-
-      - name: Wait for the server to reboot
-        become: false
-        local_action: wait_for host="{{ansible_ssh_host}}" delay=60 state=started port="{{ansible_ssh_port}}" connect_timeout=40 timeout=360
-        when: yum_upgrade.changed
-
-  - name: Install Packstack
-    hosts: vagrant
     vars:
       packstack_common_command: "packstack --default-password=admin \
         --install-hosts={{ openstack_api_ip }} \
@@ -44,6 +20,15 @@
         --os-neutron-ml2-type-drivers=vxlan,flat \
         "
     tasks:
+      - name: Yum upgrade
+        yum:
+          name: '*'
+          state: latest
+          update_cache: yes
+
+      - name: Update networking before reboot
+        meta: flush_handlers
+
       - name: Disable firewalld
         systemd:
           name: firewalld
@@ -65,11 +50,3 @@
         async: 1200 # Possible this needs to be larger
         poll: 10
 
-      - name: Reboot host
-        shell: sleep 2 && shutdown -r now
-        async: 1
-        poll: 0
-
-      - name: Wait for the server to reboot - Can take a LONG time
-        become: false
-        local_action: wait_for host="{{ansible_ssh_host}}" delay=180 state=started port="{{ansible_ssh_port}}" connect_timeout=20 timeout=1500

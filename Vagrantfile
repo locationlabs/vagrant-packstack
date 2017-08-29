@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "packstack" do |ps|
     ps.vm.box = "bento/centos-7.3"
     ps.vm.host_name = "packstack.vagrant"
-    ps.vm.network 'private_network', ip: "172.16.0.10"
+    ps.vm.network 'private_network', ip: "172.16.0.10", auto_config: false
 
     ps.vm.provider :virtualbox do |vb, override|
       vb.memory = 8192
@@ -25,6 +25,7 @@ Vagrant.configure("2") do |config|
         ansible.galaxy_role_file = "provisioning/vagrant/requirements.yml"
         ansible.galaxy_roles_path = "provisioning/vagrant/shared-roles"
       end
+      override.vm.provision :reload
     end
 
     ps.vm.provider "vmware_fusion" do |vm, override|
@@ -41,6 +42,7 @@ Vagrant.configure("2") do |config|
         ansible.galaxy_role_file = "provisioning/vagrant/requirements.yml"
         ansible.galaxy_roles_path = "provisioning/vagrant/shared-roles"
       end
+      override.vm.provision :reload
     end
   end
 end

@@ -11,7 +11,7 @@ el_network_interfaces:
   # Used for API calls from host
   - iface: "{{ local_interface }}"
     type: ethernet
-    ip4: "{{ ansible_enp0s8.ipv4.address }}/24"
+    ip4: "{{ openstack_api_ip }}/24"
 
   # VirtualBox NAT Network interface
   # Used as the external network for OpenStack

@@ -48,3 +48,5 @@
         async: 1200 # Possible this needs to be larger
         poll: 10
 
+      - name: BUG - Init aodh database
+        command: aodh-dbsync

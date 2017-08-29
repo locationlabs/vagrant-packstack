@@ -8,8 +8,6 @@
         --install-hosts={{ openstack_api_ip }} \
         --service-workers=1 \
         --os-swift-install=n \
-        --os-heat-cfn-install=n \
-        --os-heat-cloudwatch-install=n \
         --os-heat-install=y \
         --os-neutron-metering-agent-install=n \
         --use-epel=n \

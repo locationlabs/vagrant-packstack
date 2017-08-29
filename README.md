@@ -6,12 +6,14 @@ environment.
 ## Prereqs
 
 * VirtualBox
- * Configure a NAT Network
+  * Configure a NAT Network
+
         VBoxManage natnetwork add --netname packstack --network 172.16.1.0/24 --enable
 * vagrant-hostmanager
 * vagrant-timezone
 * vagrant-reload
 * ansible
+
       mkvirtualenv vagrant-packstack -r requirements.txt
 * 8GB of ram is needed by the virt
 
@@ -28,13 +30,13 @@ Next up we need to setup OpenStack with a way to let instances get to the outsid
 called the provider network. We'll also setup a project and user for doing things not with the admin
 user, and then create something.
 
-2. Setup the external provider network and "vagrant" project/user in openstack:
- 1. `source provisioning/openstack/keystonerc_admin`
- 2. `ansible-playbook provisioning/openstack/admin-setup-tasks.yml`
+1. Setup the external provider network and "vagrant" project/user in openstack:
+   1. `source provisioning/openstack/keystonerc_admin`
+   2. `ansible-playbook provisioning/openstack/admin-setup-tasks.yml`
 
-3. Lets make something:
- 1. `source provisioning/openstack/keystonerc_vagrant`
- 2. `ansible-playbook provisioning/openstack/vagrant-demo.yml`
+2. Lets make something:
+   1. `source provisioning/openstack/keystonerc_vagrant`
+   2. `ansible-playbook provisioning/openstack/vagrant-demo.yml`
 
 After it is online, visit http://packstack.vagrant/dashboard with the creds found in
 `provisioning/openstack/keystonerc_[admin|vagrant]` or use the openstack client.

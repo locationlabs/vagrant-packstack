@@ -6,9 +6,10 @@ Vagrant.configure("2") do |config|
   config.hostmanager.include_offline = true
 
   config.vm.define "packstack" do |ps|
-    ps.vm.box = "bento/centos-7.3"
+    ps.vm.box = "bento/centos-7"
     ps.vm.host_name = "packstack.vagrant"
     ps.vm.network 'private_network', ip: "172.16.0.10", auto_config: false
+    ps.vm.boot_timeout = 600 # Increased because vagrant resume can take a long time
 
     ps.vm.provider :virtualbox do |vb, override|
       vb.memory = 8192
@@ -16,11 +17,15 @@ Vagrant.configure("2") do |config|
       vb.customize ['guestproperty', 'set', :id, '/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 10000]
       vb.customize ["modifyvm", :id, "--nic3", "natnetwork", "--nat-network3", "packstack"]
       override.vm.provision "ansible" do |ansible|
+        ansible.compatibility_mode = "2.0"
         ansible.playbook = "provisioning/vagrant/packstack-install.yml"
         ansible.extra_vars = "provisioning/vagrant/vars-virtualbox.yml"
-        ansible.sudo = true
+        ansible.become = true
         ansible.groups = {
-          "vagrant" => ["packstack"]
+          "vagrant" => ["packstack"],
+          "controller" => ["packstack"],
+          "compute" => ["packstack"],
+          "overcloud:children" => ["controller", "compute"]
         }
         ansible.galaxy_role_file = "provisioning/vagrant/requirements.yml"
         ansible.galaxy_roles_path = "provisioning/vagrant/shared-roles"
@@ -33,11 +38,15 @@ Vagrant.configure("2") do |config|
       vm.vmx["numvcpus"] = 2
       vm.vmx["vhv.enable"] = "TRUE"
       override.vm.provision "ansible" do |ansible|
+        ansible.compatibility_mode = "2.0"
         ansible.playbook = "provisioning/vagrant/packstack-install.yml"
         ansible.extra_vars = "provisioning/vagrant/vars-vmware.yml"
-        ansible.sudo = true
+        ansible.become = true
         ansible.groups = {
-          "vagrant" => ["packstack"]
+          "vagrant" => ["packstack"],
+          "controller" => ["packstack"],
+          "compute" => ["packstack"],
+          "overcloud:children" => ["controller", "compute"]
         }
         ansible.galaxy_role_file = "provisioning/vagrant/requirements.yml"
         ansible.galaxy_roles_path = "provisioning/vagrant/shared-roles"

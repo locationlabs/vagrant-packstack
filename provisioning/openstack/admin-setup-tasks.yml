@@ -10,7 +10,7 @@
           min_disk: "5"
           properties:
             os_distro: "ubuntu"
-            architecture: "x86_64"
+            os_version: "16.04"
             hw_scsi_model: "virtio-scsi"
             hw_disk_bus: "scsi"
             hw_vif_model: "virtio"
@@ -68,13 +68,16 @@
         - name: Download images
           get_url:
             url: "{{ item.url }}"
-            dest: "{{ item.name }}.img"
+            dest: "./{{ item.name }}.img"
+            # dest: '.'
           with_items: "{{ image_list }}"
+          loop_control:
+            label: "{{ item.url }}"
 
         - name: Upload images
           os_image:
             name: "{{ item.name }}"
-            filename: "{{ item.name }}.img"
+            filename: "./{{ item.name }}.img"
             min_disk: "{{ item.min_disk|default(omit) }}"
             container_format: bare
             disk_format: qcow2

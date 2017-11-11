@@ -21,4 +21,5 @@ el_network_interfaces:
 
 packstack_guest_specific_args: "--os-neutron-ovs-bridge-mappings=extnet:br-ex,localnet:br-local \
   --os-neutron-ovs-bridge-interfaces=br-ex:{{ external_interface }},br-local:{{ local_interface }}"
-openstack_api_ip: "{{ ansible_enp0s8.ipv4.address }}"
+#openstack_api_ip: "{{ ansible_enp0s8.ipv4.address }}"
+openstack_api_ip: "172.16.0.10"

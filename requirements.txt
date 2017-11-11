@@ -5,4 +5,5 @@ python-heatclient==1.10.0
 pankoclient==0.3.0 # Telemetry - Events
 aodhclient==0.9.0 # Telemetry - Alarms
 gnocchiclient==3.3.1 # Telemetry - Metrics storage
+pbr==3.1.1 # for gnocchiclient broken dependency
 netaddr
